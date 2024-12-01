@@ -1,0 +1,71 @@
+#include <bits/stdc++.h>
+using namespace std;
+int N, D;
+const int maxn = 100002;
+vector<pair<int,int>> pies; 
+vector<int> B, E;
+vector<vector<int>> adj(2*maxn);
+vector<int> s;
+queue<int> q;
+int dist[2*maxn];
+
+bool comp(int a, int b){ 
+	if(pies[a].first == pies[b].first) return pies[a].second < pies[b].second;
+	return pies[a].first < pies[b].first; 
+}
+bool comp1(int a, int y){
+	return pies[a].first < y;
+}
+int main(){
+	memset(dist, 0, sizeof(dist)); 
+	ifstream fin("piepie.in");
+	ofstream fout("piepie.out");
+	fin>>N>>D;
+	for(int i = 0; i < 2*N; i++){ int x, y; fin>>x>>y; if(i < N) pies.push_back({x, y}); else pies.push_back({y,x}); }
+	for(int i = 0; i < N; i++) B.push_back(i);
+	for(int i = N; i < 2*N; i++) E.push_back(i);
+	sort(B.begin(), B.end(), comp); sort(E.begin(), E.end(), comp);
+	for(int i = 0; i < N; i++){
+		auto t = B[i];
+		int x = pies[t].first, y = pies[t].second;
+		if(y == 0){ s.push_back(B[i]); continue; }
+		int it = lower_bound(E.begin(), E.end(), y, comp1) - E.begin();
+		while(it < N && pies[E[it]].first <= y+D){
+			adj[E[it]].push_back(B[i]); //push backwards
+			it++;
+		}
+	}
+	for(int i = 0; i < N; i++){
+		auto t = E[i];
+		int x = pies[t].first, y = pies[t].second;
+		if(y == 0){ s.push_back(E[i]); continue; }
+		int it = lower_bound(B.begin(), B.end(), y, comp1) - B.begin();
+		while(it < N && pies[B[it]].first <= y+D){
+			adj[B[it]].push_back(E[i]); //push backwards
+			it++;
+		}
+	}
+	for(int i = 0; i < s.size(); i++){ q.push(s[i]); dist[s[i]] = 1; }
+	while(!q.empty()){
+		int t = q.front();
+		q.pop();
+		for(int i = 0; i < adj[t].size(); i++){
+			if(!dist[adj[t][i]]){
+				q.push(adj[t][i]);
+				dist[adj[t][i]] = dist[t] + 1;
+			}
+		}
+	}
+	for(int i = 0; i < N; i++){
+	    if(!dist[i]) fout<<"-1"<<endl;
+		else fout<<dist[i]<<endl;
+	}
+	return 0;
+}
+	
+	
+	
+	
+		
+		
+	
