@@ -1,0 +1,30 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+
+
+int main(){
+	ifstream fin("hayfeast.in");
+	ofstream fout("hayfeast.out");
+	ll N, M;
+    vector<pair<ll,ll>> b;
+	fin>>N>>M;
+	for(int i = 0; i < N; i++){ ll x, y; fin>>x>>y; b.push_back({x, y}); }
+	ll sum = 0, ans = 1000000001;
+	multiset<ll> s;
+	for(int i = 0, j = -1; i < N, j < N; i++){
+		while(sum < M && j < N){
+			j++;
+			//if(j >= N) break;
+			sum += b[j].first;
+			s.insert(b[j].second);
+		}
+		if(j >= N) break;
+		ans = min(ans, *s.rbegin());
+		sum -= b[i].first;
+		s.erase(s.find(b[i].second));
+	}
+	fout<<ans<<endl;
+	return 0;
+}
+		
