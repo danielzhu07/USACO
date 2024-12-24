@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 1e5, maxq = 1e5;
+int N, Q;
+vector<pair<int,int>> q;
+vector<int>oq;
+vector<int> ans(maxq);
+vector<pair<int,pair<int,int>>> w;
+vector<int> r(maxn, 0), par(maxn), s(maxn, 1);
+
+bool comp(int a, int b){
+	if(q[a].first == q[b].first) return q[a].second > q[b].second;
+	return q[a].first > q[b].first;
+}
+int find(int x){
+	if(par[x] != x) par[x] = find(par[x]);
+	return par[x];
+}
+void unionByRank(int x, int y){
+	x = find(x), y = find(y);
+	if(x == y) return;
+	if(r[x] < r[y]){ par[x] = y; s[y] += s[x]; }
+	else if(r[x] > r[y]){ par[y] = x; s[x] += s[y]; }
+	else {par[x] = y; r[y]++; s[y] += s[x]; }
+}
+int main(){
+	ifstream fin("mootube.in");
+	ofstream fout("mootube.out");
+	fin>>N>>Q;
+	for(int i = 0; i < N-1; i++){ int x, y, z; fin>>x>>y>>z; w.push_back({z,{x-1,y-1}}); } 
+	sort(w.begin(), w.end(), greater<pair<int,pair<int,int>>>());
+	for(int i = 0; i < Q; i++){ int x, y; fin>>x>>y; q.push_back({x, y-1}); }
+	for(int i = 0; i < Q; i++){ oq.push_back(i); }
+	for(int i = 0; i < N; i++) par[i] = i;
+	sort(oq.begin(), oq.end(), comp);
+	int j = 0;
+	for(int i = 0; i < Q; i++){
+		int k = q[oq[i]].first, n = q[oq[i]].second;
+		while(j < w.size() && w[j].first >= k){
+			unionByRank(w[j].second.first, w[j].second.second);
+			j++;
+		}
+		ans[oq[i]] = s[find(n)]-1;
+	}
+	for(int i = 0; i < Q; i++) fout<<ans[i]<<endl;
+	return 0;
+}
+		
