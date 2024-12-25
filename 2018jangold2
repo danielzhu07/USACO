@@ -1,0 +1,69 @@
+#include <bits/stdc++.h>
+using namespace std;
+int N, K;
+const int maxn = 1e5;
+vector<vector<int>> adj(maxn+1);
+vector<int> par(maxn+1, -1), dr(maxn+1, -1), dl(maxn+1, -1);
+vector<int> leafs;
+
+/*int dfs(int cur, int prev, int d){ THIS IS WRONG BC BFS IGNORES PARENT NODE (instead should consider all directions)
+	if(adj[cur].size() == 1){ //leaf node
+		dr[cur] = d;
+		dl[cur] = 0;
+		return 1;
+	}
+	dr[cur] = d;
+	int m = INT_MAX;
+	for(auto it : adj[cur]){
+		if(it == prev) continue;
+		par[it] = cur;
+		m = min(m, dfs(it, cur, d+1));
+	}
+	dl[cur] = m;
+	return m+1;
+}*/
+void dfs(int cur, int prev, int d){
+	if(adj[cur].size() == 1){ //leaf node
+		dr[cur] = d;
+		leafs.push_back(cur);
+		return;
+	}
+	dr[cur] = d;
+	for(auto it : adj[cur]){
+		if(it == prev) continue;
+		par[it] = cur;
+		dfs(it, cur, d+1);
+	}
+}
+void bfs(){
+	queue<pair<int,int>> q;
+	for(auto it : leafs){ q.push({it, 0}); dl[it] = 0; } 
+	while(!q.empty()){
+		auto t = q.front();
+		q.pop();
+		for(auto it : adj[t.first]){
+			if(dl[it] == -1){ //not visited
+				dl[it] = t.second+1;
+				q.push({it, t.second+1});
+			}
+		}
+	}
+}
+int main(){
+	ifstream fin("atlarge.in");
+	ofstream fout("atlarge.out");
+	fin>>N>>K;
+	K--;
+	for(int i = 0; i < N-1; i++){ int x, y; fin>>x>>y; adj[x-1].push_back(y-1); adj[y-1].push_back(x-1); }
+	if(adj[K].size() == 1){ fout<<1<<endl; return 0; }
+	//int temp = dfs(K, -1, 0);
+	dfs(K, -1, 0);
+	bfs();
+	int ans = 0;
+	for(int i = 0; i < N; i++){
+		if(dr[i] >= dl[i] && dr[par[i]] < dl[par[i]]) ans++;
+	}
+	fout<<ans<<endl;
+	return 0;
+}
+	
