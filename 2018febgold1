@@ -1,0 +1,48 @@
+#include <bits/stdc++.h>
+using namespace std;
+
+int N, B;
+vector<int> t, st, sb, ans, p, n;
+vector<pair<int,int>> b;
+
+bool comp(int a, int b){
+	return t[a] > t[b];
+}
+bool comp1(int a, int c){
+	return b[a].first > b[c].first; //don't care about the order of step sizes
+}
+
+int main(){
+	ifstream fin("snowboots.in");
+	ofstream fout("snowboots.out");
+	fin>>N>>B;
+	for(int i = 0; i < N; i++){
+		int x; fin>>x;
+		t.push_back(x);
+		st.push_back(i);
+		p.push_back(i-1);
+		n.push_back(i+1);
+	}
+	for(int i = 0; i < B; i++){
+		int x, y; fin>>x>>y;
+		b.push_back({x, y});
+		sb.push_back(i);
+		ans.push_back(-1);
+	}
+	sort(st.begin(), st.end(), comp);
+	sort(sb.begin(), sb.end(), comp1);
+	int j = 0, mdist = 0;
+	for(auto i : sb){
+		while(j < N && t[st[j]] > b[i].first){
+			mdist = max(mdist, n[st[j]] - p[st[j]]);
+			n[p[st[j]]] = n[st[j]];
+			p[n[st[j]]] = p[st[j]];
+			j++;
+		}
+		if(mdist > b[i].second) ans[i] = 0;
+		else ans[i] = 1;
+	}
+	for(auto i : ans) fout<<i<<endl;
+	return 0;
+}
+	
