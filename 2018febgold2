@@ -1,0 +1,74 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int maxn = 1e5+1;
+int N;
+ll total = 0;
+vector<string> names;
+vector<vector<int>> adj(maxn);
+vector<int> par(maxn, -1), numf(maxn, 0), folders;
+vector<pair<ll,ll>> modi(maxn);
+
+int dfs(int cur, int sum){
+	if(adj[cur].size() == 0){ //file-leaf node
+		total += sum-1;
+		numf[cur] = 1;
+		return 1;
+	}
+	int t = 0;
+	for(auto it : adj[cur]){
+		par[it] = cur;
+		t += dfs(it, sum+names[it].length()+1);
+	}
+	numf[cur] = t;
+	return t;
+}
+void dfs1(int cur, ll add, ll sub, ll sum){
+	if(adj[cur].size() == 0){ //leaf node
+		return;
+	}
+	modi[cur] = {add, sub};
+	for(auto it : adj[cur]){
+		dfs1(it, add+(3*(sum+numf[cur]-numf[it])), sub+(numf[it]*(names[it].length()+1)), sum+numf[cur]-numf[it]);
+	}
+}
+int main(){
+	ifstream fin("dirtraverse.in");
+	ofstream fout("dirtraverse.out");
+	fin>>N;
+	for(int i = 0; i < N; i++){
+		string s; fin>>s;
+		names.push_back(s);
+		int m; fin>>m;
+		for(int j = 0; j < m; j++){
+			if(j == 0) folders.push_back(i);
+			int x; fin>>x;
+			adj[i].push_back(x-1); //one way
+		}
+	}
+	dfs(0, 0);
+	dfs1(0, 0, 0, 0);
+	ll ans = total;
+	/*for(auto it : folders){
+		ll tsum = total;
+		vector<int> diff;
+		int cur = it;
+		while(par[cur] != -1){
+			tsum -= numf[cur] * (names[cur].length()+1);
+			diff.push_back(numf[par[cur]] - numf[cur]);
+			cur = par[cur];
+		}
+		int temp = 0;
+		for(int i = diff.size()-1; i >= 0; i--){
+			temp += diff[i];
+			tsum += 3 * temp;
+		}
+		ans = min(ans, tsum);
+	}*/
+	for(auto it : folders){
+		ans = min(ans, ll(total+modi[it].first-modi[it].second));
+	}
+	fout<<ans<<endl;
+	return 0;
+}
+	
