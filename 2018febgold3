@@ -1,3 +1,9 @@
+/*
+3 states, dp[i][j][k]; i = days, j = # of breakouts, k = index position of last breakout.
+Only need to focus on two transitions: day continues with no breakout | day continues and a breakout occurs (of which could occur at any k <= i)
+Case 1 occurs when k < i
+Case 2 occurs when k == i (last breakout happened on the current day)
+*/
 #include <bits/stdc++.h>
 using namespace std;
 const int maxn = 100;
