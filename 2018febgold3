@@ -1,0 +1,37 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 100;
+int N;
+int dp[maxn+1][maxn+1][maxn+1]; 
+vector<int> logs;
+
+int main(){
+	ifstream fin("taming.in");
+	ofstream fout("taming.out");
+	memset(dp, 100, sizeof(dp));
+	fin>>N;
+	for(int i = 0; i < N; i++){ int x; fin>>x; logs.push_back(x); }
+	dp[0][1][0] = logs[0] == 0 ? 0 : 1;
+	for(int i = 1; i < N; i++){ //day, 0-indexed
+		for(int j = 1; j <= i+1; j++){ //#breakouts
+			for(int k = 0; k <= i; k++){ //last breakout
+				if(k == i){
+					for(int l = 0; l < k; l++){ 
+						dp[i][j][k] = min(dp[i][j][k], dp[i-1][j-1][l]);
+					}
+					if(logs[i] != 0) dp[i][j][k]++;
+					continue;
+				}
+				dp[i][j][k] = dp[i-1][j][k] + (logs[i]==i-k ? 0 : 1);
+			}
+		}
+	}
+	for(int j = 1; j <= N; j++){
+		int ans = INT_MAX;
+		for(int k = 0; k <= N; k++){
+			ans = min(ans, dp[N-1][j][k]);
+		}
+		fout<<ans<<endl;
+	}
+	return 0;
+}
