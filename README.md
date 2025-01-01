@@ -3,6 +3,7 @@ Hard Problems to Review:
 - 2018 January Gold Problem 3: Stamp Painting : Combinatorics
 - 2018 February Gold Problem 1: Snow Boots : Very Interesting
 - 2018 February Gold Problem 3: Taming the Herd : DP
+- 2018 December Gold Problem 1: Fine Dining : Dijkstra
 
 Come back to:
 - 2018 US Open Gold (already did prob 2)
