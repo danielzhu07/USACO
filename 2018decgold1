@@ -1,0 +1,59 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 5e4, maxm = 1e5;
+int N, M, K;
+vector<vector<pair<int,int>>> adj(maxn);
+vector<int> bale(maxn, -1);
+
+int main(){
+	ifstream fin("dining.in");
+	ofstream fout("dining.out");
+	fin>>N>>M>>K;
+	for(int i = 0; i < M; i++){
+		int a, b, t; fin>>a>>b>>t;
+		adj[a-1].push_back({b-1, t});
+		adj[b-1].push_back({a-1, t});
+	}
+	for(int i = 0; i < K; i++){
+		int a, b; fin>>a>>b;
+		bale[a-1] = max(bale[a-1], b); //greatest haybale is optimal
+	}
+	vector<int> d(N, INT_MAX);
+	priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+	d[N-1] = 0;
+	pq.push({0, N-1});
+	while(!pq.empty()){
+		int cur = pq.top().second;
+		pq.pop();
+		for(auto it : adj[cur]){
+			if(d[it.first] > d[cur] + it.second){
+				d[it.first] = d[cur] + it.second;
+				pq.push({d[it.first], it.first});
+			}
+		}
+	}
+	vector<int> d1(N, INT_MAX);
+	for(int i = 0; i < N; i++){
+		if(bale[i] != -1){
+			pq.push({d[i]-bale[i], i});
+			d1[i] = d[i]-bale[i];
+		}
+	}
+	while(!pq.empty()){
+		int cur = pq.top().second;
+		pq.pop();
+		for(auto it : adj[cur]){
+			if(it.second == N) continue;
+			if(d1[it.first] > d1[cur] + it.second){
+				d1[it.first] = d1[cur] + it.second;
+				pq.push({d1[it.first], it.first});
+			}
+		}
+	}
+	for(int i = 0; i < N-1; i++){
+		if(d1[i] <= d[i]) fout<<"1"<<endl;
+		else fout<<"0"<<endl;
+	}
+	return 0;
+}
+		
