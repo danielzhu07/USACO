@@ -1,0 +1,51 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 1e4;
+int N, K;
+vector<int> stree(2*maxn);
+int dp[maxn+1];
+
+void build(){
+	for(int i = N-1; i >= 1; i--){
+		stree[i] = max(stree[i<<1], stree[i<<1 | 1]);
+	}
+}
+int query(int l, int r){
+	int ans = INT_MIN;
+	for(l = l+N, r = r+N; l <= r; l>>=1, r>>=1){
+		if(l&1){
+			ans = max(ans, stree[l]);
+			l++;
+		}
+		if(!(r&1)){
+			ans = max(ans, stree[r]);
+			r--;
+		}
+	}
+	return ans;
+}
+
+int main(){
+	ifstream fin("teamwork.in");
+	ofstream fout("teamwork.out");
+	fin>>N>>K;
+	stree.resize(2*N);
+	for(int i = 0; i < N; i++){
+		int x; fin>>x;
+		stree[i+N] = x;
+	}
+	build();
+	memset(dp, 0, sizeof(dp));
+	dp[1] = stree[N];
+	for(int i = 2; i <= N; i++){
+		for(int j = 0; j < K; j++){
+			if(i-j >= 0) 
+			    dp[i] = max(dp[i], dp[i-j-1] + query(i-j, i)*(j+1));
+		}
+	}
+	fout<<dp[N-1]<<endl;
+	cout<<dp[1];
+	return 0;
+}
+	
+	
