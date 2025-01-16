@@ -8,4 +8,4 @@ Hard Problems to Review:
 
 Come back to:
 - 2018 US Open Gold Prob 1 & 3
-
+- 2018 December Gold Prob 2
