@@ -1,0 +1,61 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+const int maxn = 5000, mod = 1e9+7;
+int N, M, K;
+ll ans = 1;
+vector<vector<int>> rclass(maxn);
+vector<int> scheme(26, 0);
+vector<ll> dp(maxn+1, 0);
+vector<int> words;
+
+ll bexp(ll a, ll b){
+   if(b == 0) return 1;
+   ll res = bexp(a, b/2);
+   if(b % 2 == 1) return ((res * res % mod) * a) % mod;
+   else return (res * res) % mod;
+}
+
+int main(){
+	ifstream fin("poetry.in");
+	ofstream fout("poetry.out");
+	fin>>N>>M>>K;
+	for(int i = 0; i < N; i++){
+		int s, c; fin>>s>>c;
+		rclass[c-1].push_back(s);
+		words.push_back(s);
+	}
+	for(int i = 0; i < M; i++){
+		char e; fin>>e;
+		scheme[e-'A']++;
+	}
+	//solve the general dp
+	dp[0] = 1;
+	for(int i = 1; i <= K; i++){
+		for(int j = 0; j < words.size(); j++){
+			if(words[j] <= i){
+				dp[i] = (dp[i] + dp[i-words[j]]) % mod;
+			}
+		}
+	}
+	for(int i = 0; i < 26; i++){ //loop through all schemes  A B
+	    if(scheme[i] == 0) continue;
+		ll sum = 0;
+		for(int j = 0; j < N; j++){ //loop through rhyme classes 1 2 
+			ll t = 0;
+			for(int k = 0; k < rclass[j].size(); k++){ //loop through words in rhyme class  syllables
+				t = (t + dp[K-rclass[j][k]]) % mod;
+			}
+			sum += bexp(t, scheme[i]);
+			sum %= mod;
+		}
+		ans *= sum;
+		ans %= mod;
+	}
+	if(ans == 1) fout<<0<<endl;
+	else fout<<(ans+mod) % mod<<endl;
+	return 0;
+}
+	
+			
+				
