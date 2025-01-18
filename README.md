@@ -5,6 +5,7 @@ Hard Problems to Review:
 - 2018 February Gold Problem 3: Taming the Herd 
 - 2018 December Gold Problem 1: Fine Dining 
 - 2018 US Open Problem 2: Milking Order
+- 2019 January Gold Problem 2: Sleepy Cow Sorting
 
 Come back to:
 - 2018 US Open Gold Prob 1 & 3
