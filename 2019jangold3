@@ -1,0 +1,76 @@
+#include <bits/stdc++.h>
+using namespace std;
+typedef long long ll;
+int N, M, T;
+vector<ll> ncows(1e4);
+vector<vector<pair<ll,ll>>> adj(1e4);
+vector<ll> dist(1e4, INT_MAX), par(1e4, -1), cowpass(1e4, 0);
+vector<vector<ll>> nxt(1e4);
+
+ll dfs(int cur){
+	if(nxt[cur].size() == 0){
+		return ncows[cur];
+	}
+	for(auto it : nxt[cur]){
+		ncows[cur] += dfs(it);
+	}
+	return ncows[cur];
+}
+
+int main(){
+	ifstream fin("shortcut.in");
+	ofstream fout("shortcut.out");
+	fin>>N>>M>>T;
+	ncows.resize(N);
+	for(int i = 0; i < N; i++) fin>>ncows[i];
+	adj.resize(N);
+	for(int i = 0; i < M; i++){
+		int a, b, t; fin>>a>>b>>t;
+		adj[a-1].push_back({b-1, t});
+		adj[b-1].push_back({a-1, t});
+	}
+	priority_queue<pair<ll,ll>, vector<pair<ll,ll>>, greater<pair<ll,ll>>> pq;
+	dist[0] = 0;
+	pq.push({0, 0});
+	par.resize(N);
+	while(!pq.empty()){
+		auto t = pq.top();
+		pq.pop();
+		for(auto it : adj[t.second]){
+			if(dist[it.first] > dist[t.second]+it.second){
+				dist[it.first] = dist[t.second]+it.second;
+				par[it.first] = t.second;
+				pq.push({dist[it.first], it.first});
+			}
+			else if(dist[it.first] == dist[t.second]+it.second){
+				if(t.second < par[it.first]){
+					dist[it.first] = dist[t.second]+it.second;
+					par[it.first] = t.second;
+					pq.push({dist[it.first], it.first});
+				}
+			}
+		}
+	}
+	/*cowpass.resize(N);
+	par[0] = -1;
+	for(int i = 0; i < N; i++){
+		int cur = i;
+		while(cur != -1){
+			cowpass[cur] += ncows[i];
+			cur = par[cur];
+		}
+	}*/
+	nxt.resize(N);
+	for(int i = 1; i < N; i++){
+		nxt[par[i]].push_back(i);
+	}
+	dfs(0);
+	ll ans = 0;
+	for(int i = 1; i < N; i++){
+		if(dist[i] > T) ans = max(ans, (ll) ncows[i]*(dist[i]-T));
+	}
+	fout<<ans<<endl;
+	return 0;
+}
+		
+		
