@@ -6,6 +6,7 @@ Hard Problems to Review:
 - 2018 December Gold Problem 1: Fine Dining 
 - 2018 US Open Problem 2: Milking Order
 - 2019 January Gold Problem 2: Sleepy Cow Sorting
+- 2019 January Gold Problem 3: Shortcut
 
 Come back to:
 - 2018 US Open Gold Prob 1 & 3
