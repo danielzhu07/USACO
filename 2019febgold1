@@ -1,0 +1,104 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 1e5;
+int N, Q, c = 0;
+vector<int> e(maxn), ssize(maxn, 1), heavy(maxn, -1), depth(maxn, 0), head(maxn, -1), par(maxn, -1), rem(maxn, -1);
+vector<vector<int>> adj(maxn);
+long long stree[2*maxn];
+
+int dfs(int cur, int prev){
+	if(adj[cur].size() == 1 && adj[cur][0] == prev){ //leaf
+		return ssize[cur];
+	}
+	int maxx = 0;
+	for(auto i : adj[cur]){
+		if(i != prev){
+			depth[i] = depth[cur] + 1;
+			par[i] = cur;
+			int x = dfs(i, cur);
+			if(x > maxx){ //choose heavy path
+				maxx = x;
+				heavy[cur] = i;
+			}
+			ssize[cur] += x;
+		}
+	}
+	return ssize[cur];
+}
+void build(){
+	for(int i = N-1; i >= 1; i--){
+		stree[i] = (stree[i<<1] ^ stree[i<<1 | 1]);
+	}
+}
+void update(int x, int v){ //wrong
+	int temp = stree[rem[x]];
+	for(int i = rem[x]; i > 1; i >>= 1){
+		if(i == rem[x]) stree[i] = v;
+		int temp1 = stree[i>>1];
+		stree[i>>1] ^= temp;
+		temp = temp1;
+		stree[i>>1] ^= stree[i];
+	}
+}
+long long query(int l, int r){
+	long long ans = 0;
+	for(l, r; l <= r; l>>=1, r>>=1){
+		if(l&1){ //right child
+			ans ^= stree[l];
+			l++;
+		}
+		if(!(r&1)){ 
+			ans ^= stree[r]; 
+			r--; 
+		}
+	}
+	return ans;
+}		
+long long query1(int l, int r){
+	long long ans = 0;
+	for(; head[l] != head[r]; r = par[head[r]]){
+		if(depth[head[l]] > depth[head[r]]) swap(l, r);
+		ans ^= query(rem[head[r]], rem[r]);
+	}
+	if(depth[l] > depth[r]) swap(l, r);
+	ans ^= query(rem[l], rem[r]);
+	return ans;
+}	
+void dfs1(int cur, int h){ //heavy-light decomposition
+	stree[c+N] = e[cur];
+	rem[cur] = c+N; //KEY OBSERVATION!!!!!!!!!!!!!!!!!!!
+	head[cur] = h;
+	c++;
+	if(heavy[cur] != -1){ //traverse heavy paths first
+		dfs1(heavy[cur], h);
+	}
+	for(auto i : adj[cur]){
+		if(i != par[cur] && i != heavy[cur]){ //traverse light paths
+			dfs1(i, i);
+		}
+	}
+	return;
+}
+		
+int main(){
+	ifstream fin("cowland.in");
+	ofstream fout("cowland.out");
+	memset(stree, 0, sizeof(stree));
+	fin>>N>>Q;
+	for(int i = 0; i < N; i++) fin>>e[i];
+	for(int i = 0; i < N-1; i++){ int x, y; fin>>x>>y; adj[x-1].push_back(y-1); adj[y-1].push_back(x-1); }
+	dfs(0, -1);
+	dfs1(0, 0); //root, 3rd 
+	build();
+	while(Q--){
+		int x, y, z;
+		fin>>x>>y>>z;
+		if(x == 1){
+			update(y-1, z);
+		}
+		else{
+			fout<<query1(y-1, z-1)<<endl;
+		}
+	}
+	return 0;
+}
