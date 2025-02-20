@@ -1,0 +1,46 @@
+#include <bits/stdc++.h>
+using namespace std;
+int N;
+vector<int> plates;
+vector<vector<int>> c;
+
+bool comp(const vector<int>& s, int val){
+	return s.front() < val;
+}
+int main(){
+	ifstream fin("dishes.in");
+	ofstream fout("dishes.out");
+	fin>>N;
+	for(int i = 0; i < N; i++){ int x; fin>>x; plates.push_back(x); }
+	int top = -1;
+	int i, j = 0;
+	for(i = 0; i < N; i++){
+		if(plates[i] < top) break;
+		auto it = lower_bound(c.begin()+j, c.end(), plates[i], comp);
+		if(it == c.end()){
+			c.push_back({plates[i]}); //start new stack
+		}
+		else{
+			if(plates[i] < it->back()){ //place at top of stack
+				it->push_back(plates[i]);
+			}
+			else{ //clean stack everything up till the plate we're considering
+				while(j < c.size()){
+					int k = c[j].size()-1;
+					for(k; k >= 0; k--){
+						if(c[j][k] < plates[i]){
+							top = c[j].back();
+							c[j].pop_back();
+						}
+						else break;
+					}
+					if(k >= 0) break;
+					j++;
+				}
+						
+			}
+		}
+	}
+	fout<<i<<endl;
+	return 0;
+}
