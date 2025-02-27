@@ -1,0 +1,85 @@
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 401;
+int N, K;
+vector<int> snakes;
+int dp[maxn][maxn];
+
+int main(){
+	ifstream fin("snakes.in");
+	ofstream fout("snakes.out");
+	fin>>N>>K;
+	for(int i = 0; i < N; i++){
+		int x; fin>>x; snakes.push_back(x);
+	}
+	for (int i = 0; i < maxn; i++)
+        for (int k = 0; k < maxn; k++)
+                dp[i][k] = 4e8; // Large value for min comparisons
+  int m = INT_MIN, s = 0;
+	for(int i = 0; i < N; i++){
+	    m = max(m, snakes[i]);
+	    s += snakes[i];
+	    dp[i][0] = m * (i+1) - s; //change 0 times
+		for(int k = 1; k <= K; k++){
+			if(k > i) break; //more changes than current index
+			int m1 = INT_MIN, s1 = 0;
+			for(int s = i-1; s >= 0; s--){
+				s1 += snakes[s+1]; 	
+				m1 = max(m1, snakes[s+1]);
+				dp[i][k] = min(dp[i][k], dp[s][k-1] + (i-s)*m1 - s1);
+			}
+		} 
+	}
+	int minn = INT_MAX;
+	for(int k = 0; k <= K; k++) minn = min(minn, dp[N-1][k]);
+	fout<<minn<<endl;
+	return 0;
+}
+
+/*
+#include <bits/stdc++.h>
+using namespace std;
+const int maxn = 399;
+int N, K;
+vector<int> snakes;
+int dp[maxn][maxn][maxn]; //N, K, s
+
+int main(){
+	ifstream fin("snakes.in");
+	ofstream fout("snakes.out");
+	fin>>N>>K;
+	for(int i = 0; i < N; i++){
+		int x; fin>>x; snakes.push_back(x);
+	}
+	for (int i = 0; i <= maxn-1; i++)
+        for (int k = 0; k <= maxn-1; k++)
+            for (int s = 0; s <= maxn-1; s++)
+                dp[i][k][s] = 4e8; // Large value for min comparisons
+	for(int i = 0; i < N; i++){
+		for(int k = 0; k <= K; k++){
+		    if(k > i) break; //can't have more changes than moves
+			for(int s = 0; s < snakes.size(); s++){
+				if(snakes[s] < snakes[i]) continue; //net size has to be greater than current group
+				if(!i) {dp[i][k][s] = snakes[s]-snakes[i]; continue; } //base case
+				if(snakes[s] >= snakes[i-1]) dp[i][k][s] = min(dp[i][k][s], dp[i-1][k][s]+snakes[s]-snakes[i]); //no change
+				if(!k) break;
+				for(int s1 = 0; s1 < snakes.size(); s1++){
+					if(s == s1 || snakes[s1] < snakes[i-1]) continue;
+					dp[i][k][s] = min(dp[i][k][s], dp[i-1][k-1][s1]+snakes[s]-snakes[i]); //change;
+				}
+			}
+		}
+	}
+	int minn = INT_MAX;
+	for(int k = 0; k <= K; k++){
+	    if(k > N-1) break;
+		for(int s = 0; s < snakes.size(); s++){
+			minn = min(minn, dp[N-1][k][s]);
+		}
+	}
+	fout<<minn<<endl;
+	return 0;
+}
+*/	
+	
+	
